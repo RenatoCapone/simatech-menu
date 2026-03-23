@@ -592,14 +592,13 @@ const BADGE_LBL={popular:'Popular',new:'New',exclusive:'Only Here'};
 const TAG_CLASS={fruity:'ftag-fruity',icy:'ftag-icy',sweet:'ftag-sweet',menthol:'ftag-menthol',tobacco:'ftag-tobacco',sour:'ftag-sour',candy:'ftag-candy',classic:'ftag-classic'};
 
 // Nicotine ranges for auto-detecting juice type
-const SALT_NICS=['20mg','25mg','30mg','35mg','40mg','50mg','55mg','59mg'];
-const FREE_NICS=['0mg','1.5mg','3mg','6mg','9mg','12mg'];
-
+// Freebase: 0mg–12mg | Salt Nic: 10mg–59mg | overlap = both
+function parseNicMg(n){return parseFloat(n)||0;}
 function getJuiceType(nics){
   if(!nics||!nics.length)return null;
-  const hasSalt=nics.some(n=>SALT_NICS.includes(n));
-  const hasFree=nics.some(n=>FREE_NICS.includes(n));
-  if(hasSalt&&hasFree)return'both';
+  const hasFree=nics.some(n=>{const v=parseNicMg(n);return v>=0&&v<=12;});
+  const hasSalt=nics.some(n=>{const v=parseNicMg(n);return v>=10&&v<=59;});
+  if(hasFree&&hasSalt)return'both';
   if(hasSalt)return'salt';
   if(hasFree)return'free';
   return null;
